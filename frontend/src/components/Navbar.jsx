@@ -4,8 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/authSlice';
 import ThemeToggle from './ThemeToggle';
 
-export default function Navbar() {
-  const { user, token } = useSelector((state) => state.auth);
+const Navbar = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -15,89 +15,31 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md z-50">
+    <nav className="bg-primary text-light shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
-          Ajali Reporter
-        </Link>
-        
-        <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-            Home
-          </Link>
-          
-          {token ? (
-            <>
-              <Link to="/report" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                Report Incident
-              </Link>
-              <Link to="/account" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                My Reports
-              </Link>
-              {user && user.is_admin && (
-                <Link to="/admin" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                  Admin
-                </Link>
-              )}
-            </>
-          ) : (
-            <Link to="/login" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-              Report Incident
-            </Link>
-          )}
-        </div>
+        <Link to="/" className="text-2xl font-bold">Ajali Reporter</Link>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           <ThemeToggle />
-          {token ? (
-            <>
-              <span className="hidden md:inline text-gray-800 dark:text-gray-200">Hi, {user.username}</span>
-              <button 
-                onClick={handleLogout} 
-                className="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link 
-              to="/login" 
-              className="text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition"
-            >
-              Login
-            </Link>
-          )}
-        </div>
-      </div>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden border-t dark:border-gray-700">
-        <div className="container mx-auto px-4 py-2 flex flex-wrap gap-4">
-          <Link to="/" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-            Home
-          </Link>
-          
-          {token ? (
+          {isAuthenticated ? (
             <>
-              <Link to="/report" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                Report
-              </Link>
-              <Link to="/account" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                My Reports
-              </Link>
-              {user && user.is_admin && (
-                <Link to="/admin" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                  Admin
-                </Link>
-              )}
+              <span className="text-sm">Hello, {user.username}</span>
+              <Link to="/account" className="btn-light">My Reports</Link>
+              <Link to="/report" className="btn-light">Report</Link>
+              {user.is_admin && <Link to="/admin" className="text-sm underline">Admin</Link>}
+              <button onClick={handleLogout} className="btn-secondary">Logout</button>
             </>
           ) : (
-            <Link to="/login" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
-              Report
-            </Link>
+            <>
+              <Link to="/login" className="btn-light">Login</Link>
+              <Link to="/signup" className="btn-light">Sign Up</Link>
+            </>
           )}
         </div>
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;

@@ -1,41 +1,56 @@
-// src/pages/AdminDashboard.jsx
 import { useEffect, useState } from 'react';
-import api from '../api';
+import api from '../api/axios';
 import IncidentCard from '../components/IncidentCard';
+import { toast } from 'react-toastify';
 
-export default function AdminDashboard() {
+const AdminDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAllIncidents = async () => {
+    const fetchIncidents = async () => {
       try {
-        const res = await api.get('/admin/incidents');
+        const res = await api.get('/api/incidents');
         setIncidents(res.data);
       } catch (err) {
-        console.error('Failed to load incidents:', err);
+        toast.error('Failed to load incidents');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAllIncidents();
+    fetchIncidents();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this incident?')) return;
+    try {
+      await api.delete(`/api/incidents/${id}`);
+      setIncidents(incidents.filter(i => i.id !== id));
+      toast.success('Incident deleted');
+    } catch (err) {
+      toast.error('Delete failed');
+    }
+  };
+
+  if (loading) return <p>Loading dashboard...</p>;
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : incidents.length ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {incidents.map((incident) => (
-            <IncidentCard key={incident.id} incident={incident} />
-          ))}
-        </div>
-      ) : (
-        <p>No incidents yet.</p>
-      )}
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      <p className="mb-6">Manage all reported incidents.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {incidents.map((inc) => (
+          <IncidentCard
+            key={inc.id}
+            incident={inc}
+            showActions={true}
+            onDelete={handleDelete}
+            onEdit={() => {}}
+          />
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default AdminDashboard;

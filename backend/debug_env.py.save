@@ -1,0 +1,13 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+print("🔍 DATABASE_URL:", os.environ.get("DATABASE_URL"))
+print("📄 UPLOAD_FOLDER:", os.environ.get("UPLOAD_FOLDER"))
+print("🔐 JWT_SECRET_KEY:", os.environ.get("JWT_SECRET_KEY"))
+
+if os.environ.get("DATABASE_URL"):
+    print("✅ .env loaded successfully!")
+else:
+    print("❌ Failed to load .env — is python-dotenv installed?")

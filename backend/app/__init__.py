@@ -1,57 +1,46 @@
-from flask import Flask
-from flask import Flask, request, make_response
+# app/__init__.py
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from app.config import Config
 import os
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
-    
-    # Ensure upload directory exists
+def create_app():
+    app = Flask(__name__, instance_relative_config=True)
+
+    from app.config import Config
+    app.config.from_object(Config)
+
+    # 👇 Disable URI mode
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {'uri': False}
+    }
+
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    
-    # Initialize extensions
+
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    CORS(app)
     
-    # Enhanced CORS configuration
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:5173"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True,
-            "expose_headers": ["Content-Type", "Authorization"]
-        }
-    })
-    
-    # Handle OPTIONS requests explicitly
-    @app.before_request
-    def handle_options():
-        if request.method == "OPTIONS":
-            response = make_response()
-            response.headers.add("Access-Control-Allow-Origin", "http://localhost:5173")
-            response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-            response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-            response.headers.add("Access-Control-Allow-Credentials", "true")
-            return response
-    
-    # Register blueprints
-    from app.routes.auth import bp as auth_bp
-    from app.routes.incidents import bp as incidents_bp
-    from app.routes.admin import bp as admin_bp
-    
+
+    # Register Blueprints
+    from app.routes.auth import auth_bp
+    from app.routes.incidents import incidents_bp
+    from app.routes.users import users_bp
+
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(incidents_bp, url_prefix='/api/incidents')
-    app.register_blueprint(admin_bp, url_prefix='/api/admin')
-    
+    app.register_blueprint(users_bp, url_prefix='/api/users')
+
+    # Serve uploaded files
+    @app.route('/uploads/<filename>')
+    def uploaded_file(filename):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
     return app
