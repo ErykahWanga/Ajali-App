@@ -1,5 +1,5 @@
 # app/models/Like.py
-from app import db
+from app.config import db
 
 class Like(db.Model):
     __tablename__ = 'likes'

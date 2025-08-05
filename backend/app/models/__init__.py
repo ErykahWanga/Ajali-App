@@ -1,7 +1,12 @@
-from app import db
+from app.config import db
 from app.models.User import User
 from app.models.Incident import Incident
 
+from flask import jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.models.Comment import Comment
+from flask import Blueprint
+incidents_bp = Blueprint('incidents', __name__)
 @incidents_bp.route('/<int:id>/comments', methods=['GET'])
 def get_comments(id):
     comments = Comment.query.filter_by(incident_id=id).all()

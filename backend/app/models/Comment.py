@@ -1,5 +1,5 @@
 # app/models/Comment.py
-from app import db
+from app.config import db
 from datetime import datetime
 
 class Comment(db.Model):

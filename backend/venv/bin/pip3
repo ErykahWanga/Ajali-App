@@ -1,4 +1,4 @@
-#!/home/erykah/Ajali-Reporter/backend/venv/bin/python3
+#!/home/george/phase5/Ajali-App/backend/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys
