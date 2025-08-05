@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, send_from_directory, current_app
-from app import db
+from app.config import db
 from app.models import Incident, User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.utils.upload import allowed_file

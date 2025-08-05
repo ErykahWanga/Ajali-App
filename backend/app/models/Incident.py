@@ -1,4 +1,4 @@
-from app import db
+from app.config import db
 from datetime import datetime
 
 class Incident(db.Model):
